@@ -8,12 +8,12 @@ export const useCompareStore = defineStore('compare', () => {
   
   const aiModels = ref([
     {
-      title: "03 Mini",
+      title: "Chat GPT 03 Mini",
       model: "03-mini",
       disabled: false,
     },
     {
-      title: "GPT 4.0",
+      title: "Chat GPT 4.0",
       model: "gpt-4",
       disabled: false,
     },
@@ -49,7 +49,26 @@ export const useCompareStore = defineStore('compare', () => {
     }
   ])
 
-  const compareModels = async () => {
+  const saveModels = async () => {
+    isLoading.value = true
+    try {
+      // Your comparison logic here
+      console.log('Comparing models:', selectedModels.value)
+      console.log('With prompt:', systemPrompt.value)
+      
+      // Example async operation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Navigate to results or handle response
+      navigateTo('/results')
+    } catch (error) {
+      console.error('Comparison failed:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const updateModels = async () => {
     isLoading.value = true
     try {
       // Your comparison logic here
@@ -73,6 +92,7 @@ export const useCompareStore = defineStore('compare', () => {
     systemPrompt,
     aiModels,
     isLoading,
-    compareModels
+    saveModels,
+    updateModels
   }
 })

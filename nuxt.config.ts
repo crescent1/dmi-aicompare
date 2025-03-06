@@ -25,4 +25,21 @@ export default defineNuxtConfig({
       },
     },
   },
+  runtimeConfig: {
+    deepseek: {
+      apikey: process.env.NUXT_DEEPSEEK_API_KEY
+    },
+    openai: {
+      apikey: process.env.NUXT_OPENAI_API_KEY
+    },
+    anthropic: {
+      apikey: process.env.NUXT_ANTHROPIC_API_KEY
+    },
+    openrouter: {
+      apikey: process.env.NUXT_OPENROUTER_API_KEY
+    },
+    gemini: {
+      apikey: process.env.NUXT_GEMINI_API_KEY
+    },
+  }
 })
