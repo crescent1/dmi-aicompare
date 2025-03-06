@@ -1,8 +1,7 @@
 <template>
   <v-app>
-    <!-- <AppSidebar /> -->
     <div class="d-flex flex-column flex-grow-1">
-      <!-- <AppHeader /> -->
+      <AppHeader />
       <v-main>
         <v-container
           fluid
@@ -12,14 +11,14 @@
         </v-container>
       </v-main>
     </div>
-    <!-- <AppFooter /> -->
+    <AppFooter />
   </v-app>
 </template>
 
 <script setup lang="ts">
 useHead({
   titleTemplate: (titleChunk) => {
-    return titleChunk ? `${titleChunk} | dmi-aicompare` : 'dmi-aicompare'
+    return titleChunk ? `${titleChunk} | DMI aicompare` : 'DMI aicompare'
   }
 })
 </script>
