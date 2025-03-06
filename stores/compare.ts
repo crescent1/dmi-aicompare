@@ -1,0 +1,56 @@
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useCompareStore = defineStore('compare', () => {
+  const selectedModels = ref<string[]>([])
+  const systemPrompt = ref<string>('')
+  
+  const aiModels = ref([
+    {
+      title: "03 Mini",
+      model: "03-mini",
+      disabled: false,
+    },
+    {
+      title: "GPT 4.0",
+      model: "gpt-4",
+      disabled: false,
+    },
+    {
+      title: "Claude 3.7",
+      model: "claude-3-7",
+      disabled: false,
+    },
+    {
+      title: "Deepseek V3",
+      model: "deepseek-v3",
+      disabled: false,
+    },
+    {
+      title: "Deepseek R1",
+      model: "deepseek-r1",
+      disabled: false,
+    },
+    {
+      title: "Gemini 2.0 Flash",
+      model: "gemini-2-flash",
+      disabled: false,
+    },
+    {
+      title: "Grok 2",
+      model: "grok-2",
+      disabled: false,
+    },
+    {
+      title: "Qwen 2.5 Max",
+      model: "qwen-2-5-max",
+      disabled: false,
+    }
+  ])
+
+  return {
+    selectedModels,
+    systemPrompt,
+    aiModels
+  }
+})
