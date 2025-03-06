@@ -16,7 +16,7 @@
           </v-chip>
         </div>
         
-        <v-form>
+        <v-form @submit.prevent="handleSubmit">
           <div class="mb-6">
             <div class="d-flex align-center justify-space-between mb-4">
               <div class="d-flex align-center">
@@ -82,11 +82,13 @@
             color="primary"
             size="large"
             block
+            :loading="isLoading"
             :disabled="!selectedModels.length || selectedModels.length > 6 || !systemPrompt"
             class="text-none"
             elevation="2"
+            type="submit"
           >
-            Start Comparison
+            {{ isLoading ? 'Comparing...' : 'Start Comparison' }}
             <v-icon icon="mdi-arrow-right" class="ml-2"></v-icon>
           </v-btn>
         </v-form>
@@ -99,7 +101,12 @@
 import { storeToRefs } from 'pinia'
 import { useCompareStore } from '~/stores/compare'
 
-const { selectedModels, systemPrompt, aiModels } = storeToRefs(useCompareStore())
+const compareStore = useCompareStore()
+const { selectedModels, systemPrompt, aiModels, isLoading } = storeToRefs(compareStore)
+
+const handleSubmit = async () => {
+  await compareStore.compareModels()
+}
 
 
 definePageMeta({

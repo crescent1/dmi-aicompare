@@ -4,6 +4,7 @@ import { ref, computed } from 'vue'
 export const useCompareStore = defineStore('compare', () => {
   const selectedModels = ref<string[]>([])
   const systemPrompt = ref<string>('')
+  const isLoading = ref(false)
   
   const aiModels = ref([
     {
@@ -48,9 +49,30 @@ export const useCompareStore = defineStore('compare', () => {
     }
   ])
 
+  const compareModels = async () => {
+    isLoading.value = true
+    try {
+      // Your comparison logic here
+      console.log('Comparing models:', selectedModels.value)
+      console.log('With prompt:', systemPrompt.value)
+      
+      // Example async operation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Navigate to results or handle response
+      navigateTo('/results')
+    } catch (error) {
+      console.error('Comparison failed:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     selectedModels,
     systemPrompt,
-    aiModels
+    aiModels,
+    isLoading,
+    compareModels
   }
 })
