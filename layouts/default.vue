@@ -5,7 +5,7 @@
       <v-main>
         <v-container
           fluid
-          class="fill-height"
+          class="pa-3"
         >
           <NuxtPage />
         </v-container>

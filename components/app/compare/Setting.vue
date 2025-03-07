@@ -43,15 +43,19 @@
             md="3"
             class="py-0"
           >
-            <v-checkbox
-              v-model="selectedModels"
-              :label="model.title"
-              :value="model"
-              :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.includes(model.model))"
-              color="primary"
-              density="comfortable"
-              hide-details
-            />
+          <v-checkbox
+            v-model="selectedModels"
+            :label="model.title"
+            :value="{
+              title: model.title,
+              model: model.model,
+              disabled: model.disabled
+            }"
+            :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.some(m => m.model === model.model))"
+            color="primary"
+            density="comfortable"
+            hide-details
+          />
           </v-col>
         </v-row>
       </div>
