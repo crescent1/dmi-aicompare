@@ -2,7 +2,7 @@
   <v-card elevation="0" class="pa-6 rounded-lg">
     <div class="d-flex justify-space-between align-center mb-6">
       <v-card-title class="text-h5 pa-0">
-        Compare AI Models
+        Settings
       </v-card-title>
       <v-chip
         :color="selectedModels.length < 2 ? 'warning' : selectedModels.length > 6 ? 'error' : 'primary'"
@@ -46,7 +46,7 @@
             <v-checkbox
               v-model="selectedModels"
               :label="model.title"
-              :value="model.model"
+              :value="model"
               :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.includes(model.model))"
               color="primary"
               density="comfortable"

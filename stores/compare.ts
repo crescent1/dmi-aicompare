@@ -52,8 +52,10 @@ export const useCompareStore = defineStore('compare', () => {
   ])
 
   onMounted(() => {
-    selectedModels.value = getLocalData(chromeApiStore.storageKeys.selected_models)
-    systemPrompt.value = getLocalData(chromeApiStore.storageKeys.system_prompt)
+    const models = getLocalData(chromeApiStore.storageKeys.selected_models)
+    const promptText = getLocalData(chromeApiStore.storageKeys.system_prompt)
+    selectedModels.value = models ? models : []
+    systemPrompt.value = promptText ? promptText : ''
   })
 
   const saveModels = async () => {
