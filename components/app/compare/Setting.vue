@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="1" class="pa-6 rounded-lg">
+  <v-card elevation="0" class="pa-6 rounded-lg">
     <div class="d-flex justify-space-between align-center mb-6">
       <v-card-title class="text-h5 pa-0">
         Compare AI Models
@@ -119,10 +119,6 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.v-card {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
 .v-textarea :deep(.v-field__input) {
   min-height: 50px !important;
 }

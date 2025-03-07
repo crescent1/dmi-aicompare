@@ -5,3 +5,12 @@
     </v-col>
   </v-row>
 </template>
+
+<script lang="ts" setup>
+definePageMeta({
+  layout: 'default'
+})
+useHead({
+  title: 'Compare'
+})
+</script>
