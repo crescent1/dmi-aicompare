@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useCompareStore = defineStore('compare', () => {
+  const chromeApiStore = useChromeApiStore()
+  const { setLocalData } = chromeApiStore
   const selectedModels = ref<string[]>([])
   const systemPrompt = ref<string>('')
   const isLoading = ref(false)
@@ -50,41 +52,49 @@ export const useCompareStore = defineStore('compare', () => {
   ])
 
   const saveModels = async () => {
-    isLoading.value = true
-    try {
-      // Your comparison logic here
-      console.log('Comparing models:', selectedModels.value)
-      console.log('With prompt:', systemPrompt.value)
+
+    setLocalData(chromeApiStore.storageKeys.selected_models, selectedModels.value)
+    setLocalData(chromeApiStore.storageKeys.system_prompt, systemPrompt.value)
+
+    // isLoading.value = true
+    // try {
+    //   // Your comparison logic here
+    //   console.log('Comparing models:', selectedModels.value)
+    //   console.log('With prompt:', systemPrompt.value)
       
-      // Example async operation
-      await new Promise(resolve => setTimeout(resolve, 1000))
+    //   // Example async operation
+    //   await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Navigate to results or handle response
-      navigateTo('/results')
-    } catch (error) {
-      console.error('Comparison failed:', error)
-    } finally {
-      isLoading.value = false
-    }
+    //   // Navigate to results or handle response
+    //   navigateTo('/results')
+    // } catch (error) {
+    //   console.error('Comparison failed:', error)
+    // } finally {
+    //   isLoading.value = false
+    // }
+
+    console.log(selectedModels.value);
+    
   }
 
   const updateModels = async () => {
-    isLoading.value = true
-    try {
-      // Your comparison logic here
-      console.log('Comparing models:', selectedModels.value)
-      console.log('With prompt:', systemPrompt.value)
+    // isLoading.value = true
+    // try {
+    //   // Your comparison logic here
+    //   console.log('Comparing models:', selectedModels.value)
+    //   console.log('With prompt:', systemPrompt.value)
       
-      // Example async operation
-      await new Promise(resolve => setTimeout(resolve, 1000))
+    //   // Example async operation
+    //   await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Navigate to results or handle response
-      navigateTo('/results')
-    } catch (error) {
-      console.error('Comparison failed:', error)
-    } finally {
-      isLoading.value = false
-    }
+    //   // Navigate to results or handle response
+    //   navigateTo('/results')
+    // } catch (error) {
+    //   console.error('Comparison failed:', error)
+    // } finally {
+    //   isLoading.value = false
+    // }
+    console.log(selectedModels.value);
   }
 
   return {

@@ -1,6 +1,6 @@
 <template>
   <v-app-bar
-    elevation="5"
+    elevation="0"
     density="compact"
     height="85"
     class="ga-3 pl-1"

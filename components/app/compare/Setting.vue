@@ -1,11 +1,11 @@
 <template>
-  <v-card elevation="2" class="pa-6 rounded-lg">
+  <v-card elevation="1" class="pa-6 rounded-lg">
     <div class="d-flex justify-space-between align-center mb-6">
       <v-card-title class="text-h5 pa-0">
         Compare AI Models
       </v-card-title>
       <v-chip
-        :color="selectedModels.length > 6 ? 'error' : 'primary'"
+        :color="selectedModels.length < 2 ? 'warning' : selectedModels.length > 6 ? 'error' : 'primary'"
         size="small"
         variant="elevated"
       >
@@ -37,7 +37,7 @@
         <v-row>
           <v-col 
             v-for="model in aiModels" 
-            :key="model" 
+            :key="model.title" 
             cols="12" 
             sm="6" 
             md="3"
@@ -82,7 +82,7 @@
         size="large"
         block
         :loading="isLoading"
-        :disabled="!selectedModels.length || selectedModels.length > 6 || !systemPrompt"
+        :disabled="selectedModels.length < 2 || selectedModels.length > 6 || !systemPrompt"
         class="text-none"
         elevation="2"
         type="submit"
