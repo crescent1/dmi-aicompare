@@ -39,8 +39,12 @@
 </template>
 
 <script lang="ts" setup>
+const { updateSelectedModels } = useCompareStore()
 const { selectedModels } = storeToRefs(useCompareStore())
 
+watch(selectedModels, () => {
+  updateSelectedModels()
+})
 definePageMeta({
   layout: 'default'
 })

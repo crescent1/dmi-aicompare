@@ -94,12 +94,17 @@ export const useCompareStore = defineStore('compare', () => {
     }
   }
 
+  const updateSelectedModels = async () => {
+    setLocalData(chromeApiStore.storageKeys.selected_models, selectedModels.value)
+  }
+
   return {
     selectedModels,
     systemPrompt,
     aiModels,
     isLoading,
     saveModels,
-    updateModels
+    updateModels,
+    updateSelectedModels
   }
 })
