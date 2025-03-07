@@ -33,6 +33,12 @@
             </v-card>
           </v-col>
         </v-row>
+
+        <div class="chat-form-container">
+          <div class="chat-form-wrapper">
+            <AppChatForm />
+          </div>
+        </div>
       </div>
     </v-col>
   </v-row>
@@ -52,3 +58,29 @@ useHead({
   title: 'Compare'
 })
 </script>
+
+<style scoped>
+.chat-form-container {
+  position: fixed;
+  bottom: 30px; /* Height of your footer */
+  left: 0;
+  right: 0;
+  padding: 16px 24px;
+  background: linear-gradient(to bottom, transparent, rgb(var(--v-theme-background)) 20%);
+  z-index: 99;
+  transition: left 0.2s ease;
+}
+
+.chat-form-wrapper {
+  max-width: 768px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  .chat-form-container {
+    padding: 12px 16px;
+    left: 0 !important;
+  }
+}
+</style>
