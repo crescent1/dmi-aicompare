@@ -5,8 +5,9 @@
       :key="model.title"
       cols="12"
       md="6"
+      class="g-1"
     >
-      <v-card elevation="0" class="pa-4">
+      <v-card elevation="0" class="m-0">
         <v-card-title>{{ model.title }}</v-card-title>
         <v-card-text>
           Response from {{ model.title }} will appear here
