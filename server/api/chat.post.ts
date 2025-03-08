@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody<ChatRequestBody>(event)
   const { content, messages, model, systemprompt } = body
-  const finalSystemPrompt = `${systemprompt} Analyze the conversation history to provide contextually relevant responses. Build upon previous exchanges to deliver comprehensive and connected answers. Your name is AiCompare`
+  const finalSystemPrompt = `${systemprompt} Analyze the conversation history to provide contextually relevant responses. Build upon previous exchanges to deliver comprehensive and connected answers. Your name is AiCompare. Your used to compare ai models.`
 
   // Determine provider and API key based on model
   let provider: AIProvider
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     
     case 'gemini-2.0-flash':
       provider = 'google'
-      apiKey = config.google.apikey
+      apiKey = config.gemini.apikey
       break
     
     default:
