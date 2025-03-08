@@ -25,25 +25,11 @@
                   cols="12"
                   class="d-flex"
                 >
-                  <div class="position-sticky sticky-top d-none d-sm-flex">
-                    <!-- <v-avatar
-                      size="35"
-                      class="mr-3"
-                    >
-                      <v-icon icon="mdi-comment-account" color="green-darken-4" size="28"></v-icon>
-                    </v-avatar> -->
-                    <!-- <v-avatar
-                      :image="chatIconPath"
-                      size="35"
-                      class="mr-3"
-                    /> -->
-                  </div>
-
                   <div class="flex-grow-1">
                     <v-alert
                       variant="tonal"
                       border="start"
-                      color="green-darken-4"
+                      color="purple-darken-1"
                       class="rounded-lg mb-0"
                     >
                       {{ message.content }}
@@ -61,14 +47,6 @@
                   cols="12"
                   class="d-flex"
                 >
-                  <!-- <div class="position-sticky sticky-top d-none d-sm-flex">
-                    <v-avatar
-                      :image="bestari.logo"
-                      size="35"
-                      class="mr-3"
-                    />
-                  </div> -->
-
                   <div class="flex-grow-1">
                     <LoadingList v-if="model.loading && index === model.messages.length - 1" />
                     <div

@@ -129,12 +129,22 @@ export const useCompareStore = defineStore('compare', () => {
   const handleSubmit = async () => {
     messages.value = messages.value.map(model => ({
       ...model,
-      messages: [...model.messages, {
-        message_id: uuidv4(), // Unique ID for each model's message
-        role: chromeApiStore.roles.user,
-        content: userInput.value,
-        content_raw: userInput.value
-      }]
+      loading: true,
+      messages: [
+        ...model.messages,
+        {
+          message_id: uuidv4(),
+          role: chromeApiStore.roles.user,
+          content: userInput.value,
+          content_raw: userInput.value
+        },
+        {
+          message_id: uuidv4(),
+          role: chromeApiStore.roles.assistant,
+          content: '',
+          content_raw: ''
+        }
+      ]
     }))
   
     userInput.value = '' // Clear input after sending
