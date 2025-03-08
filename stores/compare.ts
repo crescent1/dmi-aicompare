@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
 import { getUnixTime } from 'date-fns';
-import type { Message } from '~/types'
+import type { Message, SanitizedMessages } from '~/types'
+import { markdownService } from '~/services/markdown';
 
 interface SelectedModel {
   model: string
@@ -15,6 +16,7 @@ interface SelectedModel {
 export const useCompareStore = defineStore('compare', () => {
   const chromeApiStore = useChromeApiStore()
   const { setLocalData, getLocalData } = chromeApiStore
+  const { renderMarkdown } = markdownService()
   const selectedModels = ref<SelectedModel[]>([])
   const systemPrompt = ref<string>('')
   const isLoading = ref(false)
@@ -146,12 +148,126 @@ export const useCompareStore = defineStore('compare', () => {
         }
       ]
     }))
+
+    // Process each model's request
+  const processStreams = messages.value.map(async (model, index) => {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: userInput.value,
+          messages: model.messages,
+          model: model.model,
+          systemprompt: systemPrompt.value
+        })
+      })
+
+      if (!response.ok) throw new Error('Network response ERROR')
+
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      let isFirstChunk = true
+      let hasValidContent = false
+      let currentContent = ''
+
+      const updateModelContent = () => {
+        messages.value = messages.value.map((m, i) => {
+          if (i === index) {
+            const lastMessageIndex = m.messages.length - 1
+            return {
+              ...m,
+              messages: m.messages.map((msg, msgIndex) => 
+                msgIndex === lastMessageIndex ? {
+                  ...msg,
+                  content: renderMarkdown(currentContent),
+                  content_raw: currentContent
+                } : msg
+              )
+            }
+          }
+          return m
+        })
+      }
+
+      while (reader) {
+        const { done, value } = await reader.read()
+        if (done) {
+          messages.value = messages.value.map((m, i) => 
+            i === index ? { ...m, loading: false } : m
+          )
+          break
+        }
+
+        const text = decoder.decode(value)
+        const chunks = text.split('\n').filter(Boolean)
+
+        for (const chunk of chunks) {
+          if (chunk.startsWith('3:')) {
+            messages.value = messages.value.map((m, i) => 
+              i === index ? {
+                ...m,
+                loading: false,
+                messages: m.messages.map((msg, msgIndex) => 
+                  msgIndex === m.messages.length - 1 ? {
+                    ...msg,
+                    content: renderMarkdown("Sistem butuh istirahat sejenak nih! ⚡"),
+                    content_raw: "Sistem butuh istirahat sejenak nih! ⚡"
+                  } : msg
+                )
+              } : m
+            )
+            return
+          }
+
+          if (chunk.startsWith('0:')) {
+            if (isFirstChunk) {
+              isFirstChunk = false
+            }
+
+            const content = chunk
+              .slice(2)
+              .replace(/^"|"$/g, '')
+              .replace(/\\n/g, '\n')
+
+            if (content) {
+              hasValidContent = true
+              currentContent += content
+              updateModelContent()
+            }
+          } else if (chunk.includes('"finishReason":"unknown"') && !hasValidContent) {
+            messages.value = messages.value.map((m, i) => 
+              i === index ? {
+                ...m,
+                loading: false,
+                messages: m.messages.map((msg, msgIndex) => 
+                  msgIndex === m.messages.length - 1 ? {
+                    ...msg,
+                    content: renderMarkdown("Sistem perlu penyegaran sebentar! ⚡"),
+                    content_raw: "Sistem perlu penyegaran sebentar! ⚡"
+                  } : msg
+                )
+              } : m
+            )
+            return
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`Error processing model ${model.title}:`, error)
+      messages.value = messages.value.map((m, i) => 
+        i === index ? { ...m, loading: false } : m
+      )
+    }
+  })
+
+  await Promise.all(processStreams)
   
     userInput.value = '' // Clear input after sending
     console.log(userInput.value);
     console.log(messages.value)
   }
-
 
   return {
     selectedModels,
