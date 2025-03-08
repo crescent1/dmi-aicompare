@@ -30,6 +30,13 @@ export const useCompareStore = defineStore('compare', () => {
       messages: [],
     },
     {
+      title: "Chat GPT 4.0",
+      model: "gpt-4o",
+      disabled: false,
+      loading: false,
+      messages: [],
+    },
+    {
       title: "Chat GPT 4.0 Mini",
       model: "gpt-4o-mini",
       disabled: false,
@@ -257,7 +264,17 @@ export const useCompareStore = defineStore('compare', () => {
     } catch (error) {
       console.error(`Error processing model ${model.title}:`, error)
       messages.value = messages.value.map((m, i) => 
-        i === index ? { ...m, loading: false } : m
+        i === index ? {
+          ...m,
+          loading: false,
+          messages: m.messages.map((msg, msgIndex) => 
+            msgIndex === m.messages.length - 1 ? {
+              ...msg,
+              content: renderMarkdown("Sistem perlu penyegaran sebentar! ⚡ \nYuk refresh halaman atau tunggu beberapa saat untuk lanjut petualangan bareng BestariAI 🌟"),
+              content_raw: "Sistem perlu penyegaran sebentar! ⚡ \nYuk refresh halaman atau tunggu beberapa saat untuk lanjut petualangan bareng BestariAI 🌟"
+            } : msg
+          )
+        } : m
       )
     }
   })
