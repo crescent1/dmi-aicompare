@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col 
-      v-for="model in selectedModels" 
+      v-for="model in updatedMessages" 
       :key="model.title"
       cols="12"
       md="6"
@@ -18,5 +18,5 @@
 </template>
 
 <script lang="ts" setup>
-const { selectedModels } = storeToRefs(useCompareStore())
+const { selectedModels, updatedMessages } = storeToRefs(useCompareStore())
 </script>

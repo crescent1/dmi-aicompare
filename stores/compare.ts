@@ -5,6 +5,7 @@ interface SelectedModel {
   model: string
   title: string
   disable: boolean
+  loading: boolean
 }
 
 export const useCompareStore = defineStore('compare', () => {
@@ -13,7 +14,7 @@ export const useCompareStore = defineStore('compare', () => {
   const selectedModels = ref<SelectedModel[]>([])
   const systemPrompt = ref<string>('')
   const isLoading = ref(false)
-  
+  const userInput = ref<string>('')
   const aiModels = ref([
     {
       title: "Chat GPT 03 Mini",
@@ -56,6 +57,8 @@ export const useCompareStore = defineStore('compare', () => {
       disabled: false,
     }
   ])
+
+  const updatedMessages = computed<SelectedModel[]>(() => selectedModels.value)
 
   onMounted(() => {
     const models = getLocalData(chromeApiStore.storageKeys.selected_models)
@@ -103,6 +106,8 @@ export const useCompareStore = defineStore('compare', () => {
     systemPrompt,
     aiModels,
     isLoading,
+    userInput,
+    updatedMessages,
     saveModels,
     updateModels,
     updateSelectedModels

@@ -34,15 +34,15 @@ import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 
+const { userInput } = storeToRefs(useCompareStore())
 const display = useDisplay()
-const userInput = ref('')
 const validationMessage = ref('')
 
 const isValidInput = computed(() => userInput.value.trim().length >= 2)
 const computedPlaceholder = computed(() => {
   return display.mobile.value 
-    ? 'Tulis Kata' 
-    : 'Tulis Kata (Tekan Enter untuk mengirim)'
+    ? 'Type Here' 
+    : 'Type Here'
 })
 
 const handleKeydown = (e: KeyboardEvent) => {
