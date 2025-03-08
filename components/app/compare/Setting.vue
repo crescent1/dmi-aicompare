@@ -49,7 +49,9 @@
             :value="{
               title: model.title,
               model: model.model,
-              disabled: model.disabled
+              disabled: model.disabled,
+              loading: model.loading,
+              messages: model.messages
             }"
             :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.some(m => m.model === model.model))"
             color="primary"

@@ -34,6 +34,7 @@ import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 
+const { handleSubmit } = useCompareStore()
 const { userInput } = storeToRefs(useCompareStore())
 const display = useDisplay()
 const validationMessage = ref('')
@@ -72,9 +73,6 @@ const onSubmit = (event: Event) => {
   }
 }
 
-const handleSubmit = () => {
-
-}
 </script>
 
 <style scoped>
