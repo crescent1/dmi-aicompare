@@ -9,7 +9,9 @@ export type AIProvider =
   'openrouterdeepseekr1' |
   'anthropicclaudesonnet' |
   'deepseekr1' |
-  'deepseekv3'
+  'deepseekv3' |
+  'google' |
+  'openrouter'
 
 export type ProviderResponse = 
   | OpenAIProvider 

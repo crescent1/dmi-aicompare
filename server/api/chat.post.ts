@@ -2,6 +2,7 @@ import { streamText } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createDeepSeek } from '@ai-sdk/deepseek'
 import { createAnthropic } from '@ai-sdk/anthropic'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import type { AIProvider, ChatRequestBody, Message } from '~/types'
 import { RuntimeConfig } from 'nuxt/schema'
@@ -9,28 +10,76 @@ import { RuntimeConfig } from 'nuxt/schema'
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody<ChatRequestBody>(event)
-
-  const { 
-    content, 
-    messages, 
-    model,
-    systemprompt 
-  } = body
-
-  const defaultSystemPrompt = config.public.systemprompt
-  const aiProvider = getAIProvider(provider, apikey, config)
+  const { content, messages, model, systemprompt } = body
   const finalSystemPrompt = `${systemprompt} Analyze the conversation history to provide contextually relevant responses. Build upon previous exchanges to deliver comprehensive and connected answers. Your name is AiCompare`
 
+  // Determine provider and API key based on model
+  let provider: AIProvider
+  let apiKey: string
+
+  switch (model) {
+    case 'qwen/qwen-max':
+    case 'x-ai/grok-2-1212':
+      provider = 'openrouter'
+      apiKey = config.openrouter.apikey
+      break
+    
+    case 'gpt-4o':
+      provider = 'openai'
+      apiKey = config.openai.apikey
+      break
+    
+    case 'deepseek-chat':
+      provider = 'deepseekv3'
+      apiKey = config.deepseek.apikey
+      break
+    
+    case 'deepseek-reasoner':
+      provider = 'deepseekr1'
+      apiKey = config.deepseek.apikey
+      break
+    
+    case 'claude-3-7-sonnet-latest':
+      provider = 'anthropicclaudesonnet'
+      apiKey = config.anthropic.apikey
+      break
+    
+    case 'gemini-2.0-flash':
+      provider = 'google'
+      apiKey = config.google.apikey
+      break
+    
+    default:
+      throw createError({
+        statusCode: 400,
+        message: `Unsupported model: ${model}`
+      })
+  }
+
+  const aiProvider = getAIProvider(provider, apiKey)
   return handleConversation(aiProvider, model, finalSystemPrompt, messages, content)
 })
 
-function handleSingleMessage(aiProvider: any, model: string, systemPrompt: string, content: string) {
-  return streamText({
-    model: aiProvider(model),
-    system: systemPrompt,
-    prompt: content,
-    onError: handleStreamError
-  }).toDataStreamResponse()
+const AI_PROVIDERS = {
+  openai: (apiKey: string) => createOpenAI({ apiKey }),
+  deepseekr1: (apiKey: string) => createDeepSeek({ apiKey }),
+  deepseekv3: (apiKey: string) => createDeepSeek({ apiKey }),
+  anthropicclaudesonnet: (apiKey: string) => createAnthropic({ apiKey }),
+  google: (apiKey: string) => createGoogleGenerativeAI({ apiKey }),
+  openrouter: (apiKey: string) => createOpenRouter({ apiKey })
+} as const
+
+function getAIProvider(provider: string, apiKey: string) {
+  const providerConfig = AI_PROVIDERS[provider as keyof typeof AI_PROVIDERS]
+  
+  if (!providerConfig) {
+    throw createError({
+      statusCode: 400,
+      message: `Unsupported AI provider: ${provider}`
+    })
+  }
+
+  return providerConfig(apiKey)
 }
 
 function handleConversation(aiProvider: any, model: string, systemPrompt: string, messages: Message[], content: string) {
@@ -57,45 +106,4 @@ function handleStreamError({ error }: { error: unknown }) {
     statusCode: 500,
     message: error instanceof Error ? error.message : 'Streaming error'
   })
-}
-
-const getConfigKey = (provider, config): string => {
-  switch (provider) {
-    case 'openai':
-      return config.openai.apikey
-    case 'deepseekr1':
-    case 'deepseekv3':
-      return config.deepseek.apikey
-    case 'openrouterdeepseekr1':
-      return config.openrouter.deepseekapikey
-    case 'anthropicclaudesonnet':
-      return config.anthropic.apikey
-    default:
-      return ''
-  }
-}
-
-const AI_PROVIDERS = {
-  openai: (apiKey: string) => createOpenAI({ apiKey }),
-  deepseekr1: (apiKey: string) => createDeepSeek({ apiKey }),
-  deepseekv3: (apiKey: string) => createDeepSeek({ apiKey }),
-  openrouterdeepseekr1: (apiKey: string) => {
-    const router = createOpenRouter({ apiKey })
-    return () => router('deepseek/deepseek-r1')
-  },
-  anthropicclaudesonnet: (apiKey: string) => createAnthropic({ apiKey })
-} as const
-
-export function getAIProvider(provider, apiKey: string, config: RuntimeConfig) {
-  const providerConfig = AI_PROVIDERS[provider as keyof typeof AI_PROVIDERS]
-  
-  if (!providerConfig) {
-    throw createError({
-      statusCode: 400,
-      message: `Unsupported AI provider: ${provider}`
-    })
-  }
-
-  const resolvedApiKey = apiKey || getConfigKey(provider, config)
-  return providerConfig(resolvedApiKey)
 }
