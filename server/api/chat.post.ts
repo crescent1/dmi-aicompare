@@ -25,17 +25,15 @@ export default defineEventHandler(async (event) => {
       break
     
     case 'gpt-4o':
+    case 'gpt-4o-mini':
+    case '03-mini':
       provider = 'openai'
       apiKey = config.openai.apikey
       break
     
     case 'deepseek-chat':
-      provider = 'deepseekv3'
-      apiKey = config.deepseek.apikey
-      break
-    
     case 'deepseek-reasoner':
-      provider = 'deepseekr1'
+      provider = 'deepseek'
       apiKey = config.deepseek.apikey
       break
     
@@ -62,11 +60,13 @@ export default defineEventHandler(async (event) => {
 
 const AI_PROVIDERS = {
   openai: (apiKey: string) => createOpenAI({ apiKey }),
-  deepseekr1: (apiKey: string) => createDeepSeek({ apiKey }),
-  deepseekv3: (apiKey: string) => createDeepSeek({ apiKey }),
+  deepseek: (apiKey: string) => createDeepSeek({ apiKey }),
   anthropicclaudesonnet: (apiKey: string) => createAnthropic({ apiKey }),
   google: (apiKey: string) => createGoogleGenerativeAI({ apiKey }),
-  openrouter: (apiKey: string) => createOpenRouter({ apiKey })
+  openrouter: (apiKey: string) => {
+    const router = createOpenRouter({ apiKey })
+    return (model: string) => router(model) // Return a function that takes the model parameter
+  }
 } as const
 
 function getAIProvider(provider: string, apiKey: string) {

@@ -30,8 +30,8 @@ export const useCompareStore = defineStore('compare', () => {
       messages: [],
     },
     {
-      title: "Chat GPT 4.0",
-      model: "gpt-4o",
+      title: "Chat GPT 4.0 Mini",
+      model: "gpt-4o-mini",
       disabled: false,
       loading: false,
       messages: [],

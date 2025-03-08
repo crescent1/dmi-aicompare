@@ -48,12 +48,12 @@
                   class="d-flex"
                 >
                   <div class="flex-grow-1">
-                    <LoadingList v-if="model.loading && index === model.messages.length - 1" />
                     <div
                       v-if="message.content"
                       class="rounded-lg mb-0 px-2 py-0 message-content"
                       v-html="message.content"
                     />
+                    <LoadingList v-if="model.loading && index === model.messages.length - 1" />
                   </div>
                 </v-col>
               </v-row>

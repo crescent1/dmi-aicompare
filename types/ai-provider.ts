@@ -8,8 +8,7 @@ export type AIProvider =
   'openai' |
   'openrouterdeepseekr1' |
   'anthropicclaudesonnet' |
-  'deepseekr1' |
-  'deepseekv3' |
+  'deepseek' |
   'google' |
   'openrouter'
 
