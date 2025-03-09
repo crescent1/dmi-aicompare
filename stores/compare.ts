@@ -110,23 +110,6 @@ export const useCompareStore = defineStore('compare', () => {
       console.error('Comparison failed:', error)
     } finally {
       isLoading.value = false
-      navigateTo('/compare')
-    }
-  }
-
-  const updateModels = async () => {
-    try {
-      
-      isLoading.value = true
-      setLocalData(chromeApiStore.storageKeys.selected_models, selectedModels.value)
-      setLocalData(chromeApiStore.storageKeys.system_prompt, systemPrompt.value)
-      messages.value = selectedModels.value
-      
-    } catch (error) {
-      console.error('Comparison failed:', error)
-    } finally {
-      isLoading.value = false
-      // navigateTo('/compare')
     }
   }
 
@@ -294,7 +277,6 @@ export const useCompareStore = defineStore('compare', () => {
     userInput,
     updatedMessages,
     saveModels,
-    updateModels,
     updateSelectedModels,
     handleSubmit
   }
