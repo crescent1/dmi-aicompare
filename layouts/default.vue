@@ -18,7 +18,7 @@
 <script setup lang="ts">
 useHead({
   titleTemplate: (titleChunk) => {
-    return titleChunk ? `${titleChunk} | DMI aicompare` : 'DMI aicompare'
+    return titleChunk ? `${titleChunk} | DMI AIcompare` : 'DMI AIcompare'
   }
 })
 </script>
