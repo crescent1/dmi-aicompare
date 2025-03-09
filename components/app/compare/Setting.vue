@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels elevation="0" class="mb-4">
+  <v-expansion-panels v-model="panelState" elevation="0" class="mb-4">
     <v-expansion-panel>
       <v-expansion-panel-title>
         <div class="d-flex align-center">
@@ -8,16 +8,18 @@
         </div>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <v-card elevation="0" class="pa-6 rounded-lg">
+        <v-card elevation="0" class="px-4">
           <div class="d-flex justify-space-between align-center mb-6">
-            <v-chip
-              :color="selectedModels.length < 2 ? 'warning' : selectedModels.length > 6 ? 'error' : 'primary'"
-              size="small"
-              variant="elevated"
-            >
-              <v-icon start icon="mdi-check-circle" size="small"></v-icon>
-              {{ selectedModels.length }}/6 models
-            </v-chip>
+            <div class="d-flex align-center gap-4">
+              <v-chip
+                :color="selectedModels.length < 2 ? 'warning' : selectedModels.length > 6 ? 'error' : 'primary'"
+                size="small"
+                variant="elevated"
+              >
+                <v-icon start icon="mdi-check-circle" size="small"></v-icon>
+                {{ selectedModels.length }}/6 models
+              </v-chip>
+            </div>
           </div>
           
           <v-form @submit.prevent="handleSubmit">
@@ -49,21 +51,26 @@
                   md="3"
                   class="py-0"
                 >
-                <v-checkbox
-                  v-model="selectedModels"
-                  :label="model.title"
-                  :value="{
-                    title: model.title,
-                    model: model.model,
-                    disabled: model.disabled,
-                    loading: model.loading,
-                    messages: model.messages
-                  }"
-                  :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.some(m => m.model === model.model))"
-                  color="primary"
-                  density="comfortable"
-                  hide-details
-                />
+                  <v-hover v-slot="{ isHovering, props: hoverProps }">
+                    <v-checkbox
+                      v-bind="hoverProps"
+                      v-model="selectedModels"
+                      :label="model.title"
+                      :value="{
+                        title: model.title,
+                        model: model.model,
+                        disabled: model.disabled,
+                        loading: model.loading,
+                        messages: model.messages
+                      }"
+                      :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.some(m => m.model === model.model))"
+                      color="primary"
+                      density="comfortable"
+                      hide-details
+                      :class="{ 'elevation-3': isHovering }"
+                      class="transition-ease-in-out rounded-lg pa-2"
+                    />
+                  </v-hover>
                 </v-col>
               </v-row>
             </div>
@@ -89,49 +96,98 @@
               ></v-textarea>
             </div>
 
-            <v-btn
-              color="primary"
-              size="large"
-              block
-              :loading="isLoading"
-              :disabled="selectedModels.length < 2 || selectedModels.length > 6 || !systemPrompt"
-              class="text-none"
-              elevation="2"
-              type="submit"
-            >
-              Save
-              <v-icon icon="mdi-content-save" class="ml-2"></v-icon>
-            </v-btn>
+            <div class="d-flex">
+              <v-btn
+                color="error"
+                variant="outlined"
+                size="large"
+                prepend-icon="mdi-delete"
+                @click="clearData"
+                :disabled="!selectedModels.length && !systemPrompt"
+                class="text-none flex-grow-0 mr-2"
+                elevation="2"
+                type="button"
+              >
+                Clear Data
+              </v-btn>
+
+              <v-btn
+                color="primary"
+                size="large"
+                :loading="isLoading"
+                :disabled="selectedModels.length < 2 || selectedModels.length > 6 || !systemPrompt"
+                class="text-none flex-grow-1"
+                elevation="2"
+                type="submit"
+              >
+                Save
+                <v-icon icon="mdi-content-save" class="ml-2"></v-icon>
+              </v-btn>
+            </div>
           </v-form>
         </v-card>
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>
   
+  <v-snackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    :timeout="3000"
+  >
+    {{ snackbar.text }}
+  </v-snackbar>
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia'
-import { useCompareStore } from '~/stores/compare'
+const panelState = ref([0]) // Keep panel open by default
+const snackbar = ref({
+  show: false,
+  text: '',
+  color: 'success'
+})
 
 const compareStore = useCompareStore()
+const chromeStore = useChromeApiStore()
 const { selectedModels, systemPrompt, aiModels, isLoading } = storeToRefs(compareStore)
-const { saveModels } = compareStore
+const { saveModels, updateSelectedModels } = compareStore
+const { removeLocalData } = chromeStore
 
-const props = defineProps({
-  settingFrom: {
-    type: String,
-    required: true
+const showNotification = (text: string, color = 'success') => {
+  snackbar.value = {
+    show: true,
+    text,
+    color
   }
-})
+}
+
+const clearData = () => {
+  selectedModels.value = []
+  systemPrompt.value = ''
+
+  removeLocalData(chromeStore.storageKeys.selected_models)
+  removeLocalData(chromeStore.storageKeys.system_prompt)
+  showNotification('Data cleared successfully', 'info')
+}
 
 const handleSubmit = async () => {
   await saveModels()
+  showNotification('Settings saved successfully')
 }
+
+watch(selectedModels, async () => {
+  updateSelectedModels().then(() => {
+    showNotification('Settings saved successfully')
+  })
+})
 </script>
 
 <style scoped>
 .v-textarea :deep(.v-field__input) {
   min-height: 50px !important;
+}
+
+.transition-ease-in-out {
+  transition: all 0.3s ease-in-out;
 }
 </style>

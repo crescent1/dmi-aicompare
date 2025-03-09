@@ -8,7 +8,7 @@
         <!-- Result Cards -->
         <AppChatResult class="chat-messages-container" />
 
-        <div v-if="selectedModels.length > 2" class="chat-form-container">
+        <div v-if="selectedModels.length > 1" class="chat-form-container">
           <div class="chat-form-wrapper">
             <AppChatForm />
           </div>
@@ -19,12 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-const { updateSelectedModels } = useCompareStore()
 const { selectedModels } = storeToRefs(useCompareStore())
 
-watch(selectedModels, () => {
-  updateSelectedModels()
-})
 definePageMeta({
   layout: 'default'
 })
