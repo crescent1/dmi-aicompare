@@ -37,12 +37,14 @@ export default defineEventHandler(async (event) => {
       apiKey = config.deepseek.apikey
       break
     
+    case 'claude-3-5-sonnet-latest':
     case 'claude-3-7-sonnet-latest':
       provider = 'anthropicclaudesonnet'
       apiKey = config.anthropic.apikey
       break
     
     case 'gemini-2.0-flash':
+    case 'gemini-2.0-flash-001':
       provider = 'google'
       apiKey = config.gemini.apikey
       break

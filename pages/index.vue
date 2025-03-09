@@ -3,7 +3,7 @@
     <v-col cols="12" class="pa-0">
       <div class="px-0">
         <!-- Settings Panel -->
-        <AppCompareSetting :setting-from="'home'" />
+        <AppCompareSetting />
 
         <!-- Result Cards -->
         <AppChatResult class="chat-messages-container" />

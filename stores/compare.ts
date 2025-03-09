@@ -44,6 +44,13 @@ export const useCompareStore = defineStore('compare', () => {
       messages: [],
     },
     {
+      title: "Claude 3.5",
+      model: "claude-3-5-sonnet-latest",
+      disabled: false,
+      loading: false,
+      messages: [],
+    },
+    {
       title: "Claude 3.7",
       model: "claude-3-7-sonnet-latest",
       disabled: false,
@@ -66,7 +73,7 @@ export const useCompareStore = defineStore('compare', () => {
     },
     {
       title: "Gemini 2.0 Flash",
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-001",
       disabled: false,
       loading: false,
       messages: [],
