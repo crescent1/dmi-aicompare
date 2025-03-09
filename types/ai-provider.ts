@@ -6,8 +6,7 @@ import type { AnthropicProvider } from '@ai-sdk/anthropic'
 
 export type AIProvider = 
   'openai' |
-  'openrouterdeepseekr1' |
-  'anthropicclaudesonnet' |
+  'anthropic' |
   'deepseek' |
   'google' |
   'openrouter'

@@ -4,6 +4,8 @@ import { createDeepSeek } from '@ai-sdk/deepseek'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
+import { v4 as uuidv4 } from 'uuid'
+import type { Message as VercelMessage } from 'ai'
 import type { AIProvider, ChatRequestBody, Message } from '~/types'
 import { RuntimeConfig } from 'nuxt/schema'
 
@@ -38,8 +40,10 @@ export default defineEventHandler(async (event) => {
       break
     
     case 'claude-3-5-sonnet-latest':
+      provider = 'anthropic'
+      apiKey = config.anthropic.apikey
     case 'claude-3-7-sonnet-latest':
-      provider = 'anthropicclaudesonnet'
+      provider = 'anthropic'
       apiKey = config.anthropic.apikey
       break
     
@@ -63,7 +67,10 @@ export default defineEventHandler(async (event) => {
 const AI_PROVIDERS = {
   openai: (apiKey: string) => createOpenAI({ apiKey }),
   deepseek: (apiKey: string) => createDeepSeek({ apiKey }),
-  anthropicclaudesonnet: (apiKey: string) => createAnthropic({ apiKey }),
+  anthropic: (apiKey: string) => createAnthropic({ 
+    apiKey,
+    baseURL: 'https://api.anthropic.com/v1',
+  }),
   google: (apiKey: string) => createGoogleGenerativeAI({ apiKey }),
   openrouter: (apiKey: string) => {
     const router = createOpenRouter({ apiKey })
@@ -84,7 +91,7 @@ function getAIProvider(provider: string, apiKey: string) {
   return providerConfig(apiKey)
 }
 
-function handleConversation(aiProvider: any, model: string, systemPrompt: string, messages: Message[], content: string) {
+function handleConversationOld(aiProvider: any, model: string, systemPrompt: string, messages: Message[], content: string) {
   const transformedMessages = messages
     .map(msg => ({
       role: msg.role as "system" | "user" | "assistant",
@@ -103,9 +110,42 @@ function handleConversation(aiProvider: any, model: string, systemPrompt: string
   }).toDataStreamResponse()
 }
 
-function handleStreamError({ error }: { error: unknown }) {
+function handleConversation(aiProvider: any, model: string, systemPrompt: string, messages: Message[], content: string) {
+  const transformedMessages: VercelMessage[] = messages
+    .map(msg => ({
+      id: uuidv4(),
+      role: msg.role as 'system' | 'user' | 'assistant',
+      content: msg.content_raw ? msg.content_raw : 'hi'
+    }))
+    .slice(-4)
+
+  const payload = {
+    model: aiProvider(model),
+    messages: [
+      { role: 'system' as const, content: systemPrompt },
+      ...transformedMessages,
+      { role: 'user' as const, content }
+    ],
+    temperature: 0.7,
+    stream: true,
+    onError: handleStreamError
+  }
+
+  return streamText(payload).toDataStreamResponse()
+}
+
+function handleStreamErrorOld({ error }: { error: unknown }) {
   throw createError({
     statusCode: 500,
     message: error instanceof Error ? error.message : 'Streaming error'
+  })
+}
+
+function handleStreamError({ error }: { error: unknown }) {
+  console.error('Stream error details:', error)
+  throw createError({
+    statusCode: 500,
+    message: error instanceof Error ? error.message : 'Streaming error',
+    cause: error
   })
 }
