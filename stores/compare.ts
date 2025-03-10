@@ -151,16 +151,21 @@ export const useCompareStore = defineStore('compare', () => {
 
   const handleData = async (id: string) => {
     if (!id) return
-    console.log(id);
     const data = await fetchItemById(id)
     if (data) {
       messages.value = data.messages || []
+      selectedModels.value = data.messages || []
       item.value = data
       // Only trigger handleSubmit if there's pending user input
       if (userInput.value.trim()) {
         handleSubmit()
       }
     }
+
+    console.log('selected ', selectedModels.value);
+    console.log('message ', messages.value);
+    
+    
   }
 
   const handleSubmit = async () => {
@@ -327,6 +332,16 @@ export const useCompareStore = defineStore('compare', () => {
     return str.length > 25 ? str.substring(0, 25) : str;
   }
 
+  const resetStore = () => {
+    messages.value = selectedModels.value.map(model => ({
+      ...model,
+      loading: false,
+      messages: []
+    }))
+    item.value = undefined
+    userInput.value = ''
+  }
+
   return {
     selectedModels,
     systemPrompt,
@@ -340,6 +355,7 @@ export const useCompareStore = defineStore('compare', () => {
     updateSelectedModels,
     handleSubmit,
     handleSubmitRoot,
-    handleData
+    handleData,
+    resetStore
   }
 })

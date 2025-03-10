@@ -19,8 +19,15 @@
 </template>
 
 <script lang="ts" setup>
+const { resetStore } = useCompareStore()
 const { selectedModels, item, messages } = storeToRefs(useCompareStore())
+const route = useRoute()
 
+onMounted(() => {
+  if (route.path === '/') {
+    resetStore()
+  }
+})
 definePageMeta({
   layout: 'default'
 })

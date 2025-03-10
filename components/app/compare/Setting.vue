@@ -140,7 +140,7 @@
 </template>
 
 <script lang="ts" setup>
-const panelState = ref([0]) // Keep panel open by default
+const panelState = ref([1]) // Keep panel open by default
 const snackbar = ref({
   show: false,
   text: '',
