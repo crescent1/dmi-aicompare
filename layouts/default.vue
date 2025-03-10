@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <AppSidebar />
     <div class="d-flex flex-column flex-grow-1 bg-grey-lighten-5">
       <AppHeader />
       <v-main>

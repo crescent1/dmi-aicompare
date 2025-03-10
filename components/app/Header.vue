@@ -5,6 +5,7 @@
     height="85"
     class="ga-3 pl-1"
   >
+    <AppIconDrawer />
     <NuxtLink to="/" class="text-decoration-none pl-8">
       <div class="d-flex align-center">
         <span class="title-text font-weight-bold gradient-text">

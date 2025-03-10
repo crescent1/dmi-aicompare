@@ -2,7 +2,7 @@ import { openDB } from 'idb'
 import type { IDBPDatabase, StoreNames } from 'idb'
 
 export function useIndexedDB() {
-  const dbName = 'BestariAI'
+  const dbName = 'DMIaicompare'
   const version = 1
   const isClient = typeof window !== 'undefined'
   let db: IDBPDatabase | null = null
