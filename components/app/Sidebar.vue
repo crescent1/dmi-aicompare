@@ -1,17 +1,34 @@
 <template>
   <v-navigation-drawer
     v-model="drawer"
+    width="280"
     temporary
     class="border-0 bg-grey-lighten-5"
   >
-    <v-list-item
-      prepend-avatar="https://randomuser.me/api/portraits/men/78.jpg"
-      title="John Leider"
-    ></v-list-item>
+    <v-list-item class="p-0 mb-5">
+      <div class="d-flex align-center p-0 m-0">
+        <AppLogo />
+      </div>
+    </v-list-item>
 
+    <v-list-item
+      rounded="sm"
+      class="mb-2 custom-list-item"
+      color="blue-darken-2"
+      :title="createMessage"
+      to="/"
+      v-tooltip="createMessage"
+    >
+      <template v-slot:prepend>
+        <v-icon class="">mdi-loupe</v-icon>
+      </template>
+    </v-list-item>
     <v-divider></v-divider>
 
     <v-list density="compact" nav>
+      <v-list-subheader class="text-grey-darken-1 font-weight-medium">
+        Histories
+      </v-list-subheader> 
       <v-list-item prepend-icon="mdi-view-dashboard" title="Home" value="home"></v-list-item>
       <v-list-item prepend-icon="mdi-forum" title="About" value="about"></v-list-item>
     </v-list>

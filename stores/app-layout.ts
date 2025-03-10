@@ -13,7 +13,7 @@ export const useAppLayoutStore = defineStore('app-layout', () => {
   const drawer = ref<boolean>(false)
   const rail = ref<boolean>(false)
   const tooltipMessage = ref<string>('Open Sidebar')
-  const createMessage = ref<string>('Pertanyaan Baru')
+  const createMessage = ref<string>('New Compare')
   const suggestLink = ref<string>('https://s.id/saran-kritik-bestari-ai')
   const user = ref<User>({
     name: 'John Doe',

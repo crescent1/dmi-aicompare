@@ -2,7 +2,7 @@
   <v-expansion-panels v-model="panelState" elevation="0" class="mb-4">
     <v-expansion-panel>
       <v-expansion-panel-title>
-        <div class="d-flex align-center">
+        <div class="d-flex align-center text-blue-darken-2">
           <v-icon icon="mdi-cog" class="mr-2" />
           Settings
         </div>
@@ -12,7 +12,7 @@
           <div class="d-flex justify-space-between align-center mb-6">
             <div class="d-flex align-center gap-4">
               <v-chip
-                :color="selectedModels.length < 2 ? 'warning' : selectedModels.length > 6 ? 'error' : 'primary'"
+                :color="selectedModels.length < 2 ? 'warning' : selectedModels.length > 6 ? 'error' : 'blue-darken-2'"
                 size="small"
                 variant="elevated"
               >
@@ -28,7 +28,7 @@
                 <div class="d-flex align-center">
                   <v-icon 
                     icon="mdi-robot-industrial" 
-                    color="primary" 
+                    color="blue-darken-2" 
                     class="mr-2"
                     size="20"
                   ></v-icon>
@@ -64,7 +64,7 @@
                         messages: model.messages
                       }"
                       :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.some(m => m.model === model.model))"
-                      color="primary"
+                      color="blue-darken-2"
                       density="comfortable"
                       hide-details
                       :class="{ 'elevation-3': isHovering }"
@@ -96,28 +96,28 @@
               ></v-textarea>
             </div>
 
-            <div class="d-flex">
+            <div class="d-flex mb-2">
               <v-btn
                 color="error"
-                variant="outlined"
+                variant="text"
                 size="large"
                 prepend-icon="mdi-delete"
                 @click="clearData"
                 :disabled="!selectedModels.length && !systemPrompt"
                 class="text-none flex-grow-0 mr-2"
-                elevation="2"
+                elevation="0"
                 type="button"
               >
                 Clear Data
               </v-btn>
 
               <v-btn
-                color="primary"
+                color="blue-darken-2"
                 size="large"
                 :loading="isLoading"
                 :disabled="selectedModels.length < 2 || selectedModels.length > 6 || !systemPrompt"
                 class="text-none flex-grow-1"
-                elevation="2"
+                elevation="0"
                 type="submit"
               >
                 Save
