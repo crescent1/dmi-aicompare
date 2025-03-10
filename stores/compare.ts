@@ -128,19 +128,7 @@ export const useCompareStore = defineStore('compare', () => {
       ...model,
       loading: true,
       messages: [
-        ...model.messages,
-        {
-          message_id: uuidv4(),
-          role: chromeApiStore.roles.user,
-          content: userInput.value,
-          content_raw: userInput.value
-        },
-        {
-          message_id: uuidv4(),
-          role: chromeApiStore.roles.assistant,
-          content: '',
-          content_raw: ''
-        }
+        ...model.messages
       ]
     }))
 
@@ -165,32 +153,37 @@ export const useCompareStore = defineStore('compare', () => {
     if (!id) return
     console.log(id);
     const data = await fetchItemById(id)
-    messages.value = data?.messages || []
-    item.value = data
-    handleSubmit()
+    if (data) {
+      messages.value = data.messages || []
+      item.value = data
+      // Only trigger handleSubmit if there's pending user input
+      if (userInput.value.trim()) {
+        handleSubmit()
+      }
+    }
   }
 
   const handleSubmit = async () => {
     
-    // messages.value = messages.value.map(model => ({
-    //   ...model,
-    //   loading: true,
-    //   messages: [
-    //     ...model.messages,
-    //     {
-    //       message_id: uuidv4(),
-    //       role: chromeApiStore.roles.user,
-    //       content: userInput.value,
-    //       content_raw: userInput.value
-    //     },
-    //     {
-    //       message_id: uuidv4(),
-    //       role: chromeApiStore.roles.assistant,
-    //       content: '',
-    //       content_raw: ''
-    //     }
-    //   ]
-    // }))
+    messages.value = messages.value.map(model => ({
+      ...model,
+      loading: true,
+      messages: [
+        ...model.messages,
+        {
+          message_id: uuidv4(),
+          role: chromeApiStore.roles.user,
+          content: userInput.value,
+          content_raw: userInput.value
+        },
+        {
+          message_id: uuidv4(),
+          role: chromeApiStore.roles.assistant,
+          content: '',
+          content_raw: ''
+        }
+      ]
+    }))
 
     // Process each model's request
     const processStreams = messages.value.map(async (model, index) => {
@@ -312,6 +305,14 @@ export const useCompareStore = defineStore('compare', () => {
             )
           } : m
         )
+      } finally {
+        if (item.value) {
+          const now = new Date()
+          item.value.messages = await prepareStoreIndexDb(messages.value)
+          item.value.updated_at = getUnixTime(now)
+          const itemUpdate = await sanitizeForIndexedDB(item.value)
+          await updateItem(itemUpdate)
+        }
       }
     })
 
@@ -333,6 +334,8 @@ export const useCompareStore = defineStore('compare', () => {
     isLoading,
     userInput,
     updatedMessages,
+    item,
+    messages,
     saveModels,
     updateSelectedModels,
     handleSubmit,

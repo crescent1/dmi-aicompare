@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-const { selectedModels } = storeToRefs(useCompareStore())
+const { selectedModels, item, messages } = storeToRefs(useCompareStore())
 
 definePageMeta({
   layout: 'default'
