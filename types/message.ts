@@ -14,7 +14,7 @@ export interface SanitizedMessages {
 export interface SelectedModel {
   model: string
   title: string
-  disable: boolean
+  disabled: boolean
   loading: boolean
   messages: Message[]
 }

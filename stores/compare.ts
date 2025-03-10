@@ -153,8 +153,16 @@ export const useCompareStore = defineStore('compare', () => {
     if (!id) return
     const data = await fetchItemById(id)
     if (data) {
-      messages.value = data.messages || []
-      selectedModels.value = data.messages || []
+      const transformedData = data.messages.map(msg => ({
+        title: msg.title,
+        model: msg.model,
+        disabled: false,
+        loading: false,
+        messages: msg.messages
+      }))
+      messages.value = transformedData
+      selectedModels.value = transformedData
+      
       item.value = data
       // Only trigger handleSubmit if there's pending user input
       if (userInput.value.trim()) {
@@ -162,10 +170,6 @@ export const useCompareStore = defineStore('compare', () => {
       }
     }
 
-    console.log('selected ', selectedModels.value);
-    console.log('message ', messages.value);
-    
-    
   }
 
   const handleSubmit = async () => {

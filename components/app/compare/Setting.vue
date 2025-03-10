@@ -56,13 +56,7 @@
                       v-bind="hoverProps"
                       v-model="selectedModels"
                       :label="model.title"
-                      :value="{
-                        title: model.title,
-                        model: model.model,
-                        disabled: model.disabled,
-                        loading: model.loading,
-                        messages: model.messages
-                      }"
+                      :value="model"
                       :disabled="model.disabled || (selectedModels.length >= 6 && !selectedModels.some(m => m.model === model.model))"
                       color="blue-darken-2"
                       density="comfortable"
@@ -140,6 +134,8 @@
 </template>
 
 <script lang="ts" setup>
+import type { Message } from '~/types'
+
 const panelState = ref([1]) // Keep panel open by default
 const snackbar = ref({
   show: false,
@@ -173,6 +169,22 @@ const clearData = () => {
 const handleSubmit = async () => {
   await saveModels()
   showNotification('Settings saved successfully')
+}
+
+interface ModelType {
+  title: string
+  model: string
+  disabled: boolean
+  loading: boolean
+  messages: Message[]
+}
+
+const handleModelSelection = (checked: boolean | null, model: ModelType) => {
+  if (checked === true) {
+    selectedModels.value.push(model)
+  } else if (checked === false) {
+    selectedModels.value = selectedModels.value.filter(m => m.model !== model.model)
+  }
 }
 
 watch(selectedModels, async () => {
