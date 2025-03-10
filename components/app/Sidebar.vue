@@ -1,38 +1,97 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    width="280"
-    temporary
-    class="border-0 bg-grey-lighten-5"
-  >
-    <v-list-item class="p-0 mb-5">
-      <div class="d-flex align-center p-0 m-0">
-        <AppLogo />
-      </div>
-    </v-list-item>
-
-    <v-list-item
-      rounded="sm"
-      class="mb-2 custom-list-item"
-      color="blue-darken-2"
-      :title="createMessage"
-      to="/"
-      v-tooltip="createMessage"
+  <ClientOnly>
+    <v-navigation-drawer
+      v-model="drawer"
+      width="280"
+      temporary
+      class="border-0 bg-grey-lighten-5"
     >
-      <template v-slot:prepend>
-        <v-icon class="">mdi-loupe</v-icon>
-      </template>
-    </v-list-item>
-    <v-divider></v-divider>
+      <v-list-item class="p-0 mb-5">
+        <div class="d-flex align-center p-0 m-0">
+          <AppLogo  @click="toggleDrawer()" />
+        </div>
+      </v-list-item>
 
-    <v-list density="compact" nav>
-      <v-list-subheader class="text-grey-darken-1 font-weight-medium">
-        Histories
-      </v-list-subheader> 
-      <v-list-item prepend-icon="mdi-view-dashboard" title="Home" value="home"></v-list-item>
-      <v-list-item prepend-icon="mdi-forum" title="About" value="about"></v-list-item>
-    </v-list>
-  </v-navigation-drawer>
+      <v-list-item
+        rounded="sm"
+        class="mb-2 custom-list-item"
+        color="blue-darken-2"
+        :title="createMessage"
+        to="/"
+        v-tooltip="createMessage"
+        @click="toggleDrawer()"
+      >
+        <template v-slot:prepend>
+          <v-icon class="">mdi-loupe</v-icon>
+        </template>
+      </v-list-item>
+      <v-divider></v-divider>
+
+      <v-list density="compact" nav>
+        <v-list-subheader class="text-grey-darken-1 font-weight-medium">
+          Histories
+        </v-list-subheader> 
+        
+        <v-list-item
+          v-for="item in chromeApiStore.items"
+          :key="item.id"
+          :title="item.title"
+          color="green-darken-2"
+          :to="'/compare/' + item.id"
+          link
+          class="mb-1"
+          @click="handleItemClick"
+        >
+          <template #prepend>
+            <v-icon class="">mdi-comment-account</v-icon>
+          </template>
+
+          <template #append>
+            <div @click.prevent.stop>
+              <v-menu>
+                <template #activator="{ props }">
+                  <v-btn
+                    icon="mdi-dots-vertical"
+                    variant="text"
+                    size="small"
+                    v-bind="props"
+                    @click.prevent.stop
+                  />
+                </template>
+                <v-card min-width="200">
+                  <v-list>
+                    <v-list-item
+                      prepend-icon="mdi-pencil"
+                      title="Rename"
+                      density="compact"
+                      @click="handleRename(item)"
+                    />
+                    <v-list-item
+                      prepend-icon="mdi-delete"
+                      title="Delete"
+                      color="error"
+                      density="compact"
+                      @click="handleDelete(item)"
+                    >
+                      <template #title>
+                        <span class="text-error">Delete</span>
+                      </template>
+                      <template #prepend>
+                        <v-icon color="error">
+                          mdi-delete
+                        </v-icon>
+                      </template>
+                    </v-list-item>
+                  </v-list>
+                </v-card>
+              </v-menu>
+            </div>
+          </template>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+  </ClientOnly>
+  
   
   <!-- <v-navigation-drawer
     v-model="drawer"
@@ -220,7 +279,7 @@
 import type { Item, RouteParams } from '~/types'
 
 const chromeApiStore = useChromeApiStore()
-const { setRail } = useAppLayoutStore()
+const { setRail, toggleDrawer } = useAppLayoutStore()
 const { fetchItems, deleteItem, updateItem, sanitizeForIndexedDB } = chromeApiStore
 const { drawer, rail, chatIconPath, createMessage, suggestLink } = storeToRefs(useAppLayoutStore())
 const route = useRoute()
