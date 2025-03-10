@@ -47,6 +47,25 @@ export function markdownService() {
     return self.renderToken(tokens, idx, options)
   }
 
+  // Add table wrapper for responsiveness
+  md.renderer.rules.table_open = () => {
+    return '<div class="table-responsive"><table class="markdown-table w-100">'
+  }
+
+  md.renderer.rules.table_close = () => {
+    return '</table></div>'
+  }
+
+  // Style table headers
+  md.renderer.rules.th_open = () => {
+    return '<th class="text-left pa-2 font-weight-bold">'
+  }
+
+  // Style table cells
+  md.renderer.rules.td_open = () => {
+    return '<td class="pa-2">'
+  }
+
   function renderMarkdown(content: string) {
     // Pre-process content to handle consecutive newlines
     const processedContent = content

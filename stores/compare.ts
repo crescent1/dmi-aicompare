@@ -29,13 +29,13 @@ export const useCompareStore = defineStore('compare', () => {
       loading: false,
       messages: [],
     },
-    {
-      title: "Chat GPT 4.0",
-      model: "gpt-4",
-      disabled: false,
-      loading: false,
-      messages: [],
-    },
+    // {
+    //   title: "Chat GPT 4.0",
+    //   model: "gpt-4",
+    //   disabled: false,
+    //   loading: false,
+    //   messages: [],
+    // },
     {
       title: "Chat GPT 4.0 Mini",
       model: "gpt-4o-mini",
@@ -43,13 +43,13 @@ export const useCompareStore = defineStore('compare', () => {
       loading: false,
       messages: [],
     },
-    {
-      title: "Claude 3.5",
-      model: "claude-3-5-sonnet-latest",
-      disabled: false,
-      loading: false,
-      messages: [],
-    },
+    // {
+    //   title: "Claude 3.5",
+    //   model: "claude-3-5-sonnet-latest",
+    //   disabled: false,
+    //   loading: false,
+    //   messages: [],
+    // },
     {
       title: "Claude 3.7",
       model: "claude-3-7-sonnet-latest",

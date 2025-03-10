@@ -8,7 +8,7 @@
       class="g-1"
     >
       <v-card elevation="0" class="m-0 chat-messages">
-        <v-card-title>{{ model.title }}</v-card-title>
+        <v-card-title class="text-blue-darken-2">{{ model.title }}</v-card-title>
         <v-card-text>
           <div>
             <div
@@ -209,5 +209,26 @@ const { selectedModels, updatedMessages } = storeToRefs(useCompareStore())
     padding: 12px 16px;
     left: 0 !important;
   }
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+
+.markdown-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.markdown-table th,
+.markdown-table td {
+  border: 1px solid #ddd;
+}
+
+.markdown-table tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 </style>

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody<ChatRequestBody>(event)
   const { content, messages, model, systemprompt } = body
-  const finalSystemPrompt = `${systemprompt} Analyze the conversation history to provide contextually relevant responses. Build upon previous exchanges to deliver comprehensive and connected answers. Your name is AiCompare. Your used to compare ai models.`
+  const finalSystemPrompt = `${systemprompt} Analyze the conversation history to provide contextually relevant responses. Build upon previous exchanges to deliver comprehensive and connected answers.`
 
   // Determine provider and API key based on model
   let provider: AIProvider
@@ -66,7 +66,10 @@ export default defineEventHandler(async (event) => {
 
 const AI_PROVIDERS = {
   openai: (apiKey: string) => createOpenAI({ apiKey }),
-  deepseek: (apiKey: string) => createDeepSeek({ apiKey }),
+  deepseek: (apiKey: string) => createDeepSeek({ 
+    apiKey,
+    baseURL: 'https://api.deepseek.com'
+  }),
   anthropic: (apiKey: string) => createAnthropic({ 
     apiKey,
     baseURL: 'https://api.anthropic.com/v1',
