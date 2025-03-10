@@ -2,25 +2,20 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { v4 as uuidv4 } from 'uuid';
 import { getUnixTime } from 'date-fns';
-import type { Message, SanitizedMessages } from '~/types'
+import type { Message, SelectedModel, SanitizedMessages, Item } from '~/types'
 import { markdownService } from '~/services/markdown';
 
-interface SelectedModel {
-  model: string
-  title: string
-  disable: boolean
-  loading: boolean
-  messages: Message[]
-}
 
 export const useCompareStore = defineStore('compare', () => {
   const chromeApiStore = useChromeApiStore()
-  const { setLocalData, getLocalData } = chromeApiStore
+  const { setLocalData, getLocalData, addItem, updateItem, fetchItemById, prepareStoreIndexDb, sanitizeForIndexedDB } = chromeApiStore
   const { renderMarkdown } = markdownService()
+  const router = useRouter()
   const selectedModels = ref<SelectedModel[]>([])
   const systemPrompt = ref<string>('')
   const isLoading = ref(false)
   const userInput = ref<string>('')
+  const item = ref<Item>()
   const aiModels = ref([
     {
       title: "Chat GPT 03 Mini",
@@ -125,7 +120,10 @@ export const useCompareStore = defineStore('compare', () => {
     messages.value = selectedModels.value
   }
 
-  const handleSubmit = async () => {
+  const handleSubmitRoot = async () => {
+    const idData: string = uuidv4()
+    const now: Date = new Date()
+
     messages.value = messages.value.map(model => ({
       ...model,
       loading: true,
@@ -146,134 +144,186 @@ export const useCompareStore = defineStore('compare', () => {
       ]
     }))
 
-    // Process each model's request
-  const processStreams = messages.value.map(async (model, index) => {
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: userInput.value,
-          messages: model.messages,
-          model: model.model,
-          systemprompt: systemPrompt.value
-        })
-      })
-
-      if (!response.ok) throw new Error('Network response ERROR')
-
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-
-      let isFirstChunk = true
-      let hasValidContent = false
-      let currentContent = ''
-
-      const updateModelContent = () => {
-        messages.value = messages.value.map((m, i) => {
-          if (i === index) {
-            const lastMessageIndex = m.messages.length - 1
-            return {
-              ...m,
-              messages: m.messages.map((msg, msgIndex) => 
-                msgIndex === lastMessageIndex ? {
-                  ...msg,
-                  content: renderMarkdown(currentContent),
-                  content_raw: currentContent
-                } : msg
-              )
-            }
-          }
-          return m
-        })
-      }
-
-      while (reader) {
-        const { done, value } = await reader.read()
-        if (done) {
-          messages.value = messages.value.map((m, i) => 
-            i === index ? { ...m, loading: false } : m
-          )
-          break
-        }
-
-        const text = decoder.decode(value)
-        const chunks = text.split('\n').filter(Boolean)
-
-        for (const chunk of chunks) {
-          if (chunk.startsWith('3:')) {
-            messages.value = messages.value.map((m, i) => 
-              i === index ? {
-                ...m,
-                loading: false,
-                messages: m.messages.map((msg, msgIndex) => 
-                  msgIndex === m.messages.length - 1 ? {
-                    ...msg,
-                    content: renderMarkdown("Sistem butuh istirahat sejenak nih! ⚡"),
-                    content_raw: "Sistem butuh istirahat sejenak nih! ⚡"
-                  } : msg
-                )
-              } : m
-            )
-            return
-          }
-
-          if (chunk.startsWith('0:')) {
-            if (isFirstChunk) {
-              isFirstChunk = false
-            }
-
-            const content = chunk
-              .slice(2)
-              .replace(/^"|"$/g, '')
-              .replace(/\\n/g, '\n')
-
-            if (content) {
-              hasValidContent = true
-              currentContent += content
-              updateModelContent()
-            }
-          } else if (chunk.includes('"finishReason":"unknown"') && !hasValidContent) {
-            messages.value = messages.value.map((m, i) => 
-              i === index ? {
-                ...m,
-                loading: false,
-                messages: m.messages.map((msg, msgIndex) => 
-                  msgIndex === m.messages.length - 1 ? {
-                    ...msg,
-                    content: renderMarkdown("Sistem perlu penyegaran sebentar! ⚡"),
-                    content_raw: "Sistem perlu penyegaran sebentar! ⚡"
-                  } : msg
-                )
-              } : m
-            )
-            return
-          }
-        }
-      }
-    } catch (error) {
-      console.error(`Error processing model ${model.title}:`, error)
-      messages.value = messages.value.map((m, i) => 
-        i === index ? {
-          ...m,
-          loading: false,
-          messages: m.messages.map((msg, msgIndex) => 
-            msgIndex === m.messages.length - 1 ? {
-              ...msg,
-              content: renderMarkdown("Sistem perlu penyegaran sebentar! ⚡ \nYuk refresh halaman atau tunggu beberapa saat untuk lanjut petualangan bareng BestariAI 🌟"),
-              content_raw: "Sistem perlu penyegaran sebentar! ⚡ \nYuk refresh halaman atau tunggu beberapa saat untuk lanjut petualangan bareng BestariAI 🌟"
-            } : msg
-          )
-        } : m
-      )
+    item.value = {
+      id: idData,
+      title: getText(userInput.value),
+      messages: await prepareStoreIndexDb(messages.value),
+      created_at: getUnixTime(now),
+      updated_at: getUnixTime(now),
     }
-  })
 
-  await Promise.all(processStreams)
+    const itemAdd = await sanitizeForIndexedDB(item.value)
+    await addItem(itemAdd)
+
+    // userInput.value = ''
+    console.log('test');
+    console.log(messages.value);
+    router.push('/compare/' + idData)
+  }
+
+  const handleData = async (id: string) => {
+    if (!id) return
+    console.log(id);
+    const data = await fetchItemById(id)
+    messages.value = data?.messages || []
+    item.value = data
+    handleSubmit()
+  }
+
+  const handleSubmit = async () => {
+    
+    // messages.value = messages.value.map(model => ({
+    //   ...model,
+    //   loading: true,
+    //   messages: [
+    //     ...model.messages,
+    //     {
+    //       message_id: uuidv4(),
+    //       role: chromeApiStore.roles.user,
+    //       content: userInput.value,
+    //       content_raw: userInput.value
+    //     },
+    //     {
+    //       message_id: uuidv4(),
+    //       role: chromeApiStore.roles.assistant,
+    //       content: '',
+    //       content_raw: ''
+    //     }
+    //   ]
+    // }))
+
+    // Process each model's request
+    const processStreams = messages.value.map(async (model, index) => {
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: userInput.value,
+            messages: model.messages,
+            model: model.model,
+            systemprompt: systemPrompt.value
+          })
+        })
+
+        if (!response.ok) throw new Error('Network response ERROR')
+
+        const reader = response.body?.getReader()
+        const decoder = new TextDecoder()
+
+        let isFirstChunk = true
+        let hasValidContent = false
+        let currentContent = ''
+
+        const updateModelContent = () => {
+          messages.value = messages.value.map((m, i) => {
+            if (i === index) {
+              const lastMessageIndex = m.messages.length - 1
+              return {
+                ...m,
+                messages: m.messages.map((msg, msgIndex) => 
+                  msgIndex === lastMessageIndex ? {
+                    ...msg,
+                    content: renderMarkdown(currentContent),
+                    content_raw: currentContent
+                  } : msg
+                )
+              }
+            }
+            return m
+          })
+        }
+
+        while (reader) {
+          const { done, value } = await reader.read()
+          if (done) {
+            messages.value = messages.value.map((m, i) => 
+              i === index ? { ...m, loading: false } : m
+            )
+            break
+          }
+
+          const text = decoder.decode(value)
+          const chunks = text.split('\n').filter(Boolean)
+
+          for (const chunk of chunks) {
+            if (chunk.startsWith('3:')) {
+              messages.value = messages.value.map((m, i) => 
+                i === index ? {
+                  ...m,
+                  loading: false,
+                  messages: m.messages.map((msg, msgIndex) => 
+                    msgIndex === m.messages.length - 1 ? {
+                      ...msg,
+                      content: renderMarkdown("Sistem butuh istirahat sejenak nih! ⚡"),
+                      content_raw: "Sistem butuh istirahat sejenak nih! ⚡"
+                    } : msg
+                  )
+                } : m
+              )
+              return
+            }
+
+            if (chunk.startsWith('0:')) {
+              if (isFirstChunk) {
+                isFirstChunk = false
+              }
+
+              const content = chunk
+                .slice(2)
+                .replace(/^"|"$/g, '')
+                .replace(/\\n/g, '\n')
+
+              if (content) {
+                hasValidContent = true
+                currentContent += content
+                updateModelContent()
+              }
+            } else if (chunk.includes('"finishReason":"unknown"') && !hasValidContent) {
+              messages.value = messages.value.map((m, i) => 
+                i === index ? {
+                  ...m,
+                  loading: false,
+                  messages: m.messages.map((msg, msgIndex) => 
+                    msgIndex === m.messages.length - 1 ? {
+                      ...msg,
+                      content: renderMarkdown("Sistem perlu penyegaran sebentar! ⚡"),
+                      content_raw: "Sistem perlu penyegaran sebentar! ⚡"
+                    } : msg
+                  )
+                } : m
+              )
+              return
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`Error processing model ${model.title}:`, error)
+        messages.value = messages.value.map((m, i) => 
+          i === index ? {
+            ...m,
+            loading: false,
+            messages: m.messages.map((msg, msgIndex) => 
+              msgIndex === m.messages.length - 1 ? {
+                ...msg,
+                content: renderMarkdown("Sistem perlu penyegaran sebentar! ⚡ \nYuk refresh halaman atau tunggu beberapa saat untuk lanjut petualangan bareng BestariAI 🌟"),
+                content_raw: "Sistem perlu penyegaran sebentar! ⚡ \nYuk refresh halaman atau tunggu beberapa saat untuk lanjut petualangan bareng BestariAI 🌟"
+              } : msg
+            )
+          } : m
+        )
+      }
+    })
+
+    await Promise.all(processStreams)
   
     userInput.value = '' // Clear input after sending
     console.log(userInput.value);
     console.log(messages.value)
+  }
+
+  const getText = (str:string) => {
+    return str.length > 25 ? str.substring(0, 25) : str;
   }
 
   return {
@@ -285,6 +335,8 @@ export const useCompareStore = defineStore('compare', () => {
     updatedMessages,
     saveModels,
     updateSelectedModels,
-    handleSubmit
+    handleSubmit,
+    handleSubmitRoot,
+    handleData
   }
 })

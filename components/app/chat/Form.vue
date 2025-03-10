@@ -34,7 +34,7 @@ import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const { handleSubmit } = useCompareStore()
+const { handleSubmit, handleSubmitRoot } = useCompareStore()
 const { userInput } = storeToRefs(useCompareStore())
 const display = useDisplay()
 const validationMessage = ref('')
@@ -66,13 +66,20 @@ const handleKeydown = (e: KeyboardEvent) => {
 
 const onSubmit = (event: Event) => {
   if (isValidInput.value) {
-    handleSubmit()
+    props.chatFrom === 'compare' ? handleSubmit() : handleSubmitRoot()
+    
     const target = event.target as HTMLElement
     target.blur()
     validationMessage.value = ''
   }
 }
 
+const props = defineProps({
+  chatFrom: {
+    type: String,
+    required: true
+  }
+})
 </script>
 
 <style scoped>

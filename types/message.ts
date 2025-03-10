@@ -10,3 +10,11 @@ export interface SanitizedMessages {
   role: string
   content_raw: string
 }
+
+export interface SelectedModel {
+  model: string
+  title: string
+  disable: boolean
+  loading: boolean
+  messages: Message[]
+}

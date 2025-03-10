@@ -177,7 +177,7 @@ const handleSubmit = async () => {
 
 watch(selectedModels, async () => {
   updateSelectedModels().then(() => {
-    showNotification('Settings saved successfully')
+    // showNotification('Settings saved successfully')
   })
 })
 </script>

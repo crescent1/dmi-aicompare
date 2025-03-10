@@ -10,7 +10,7 @@
 
         <div v-if="selectedModels.length > 1" class="chat-form-container">
           <div class="chat-form-wrapper">
-            <AppChatForm />
+            <AppChatForm chat-from="root" />
           </div>
         </div>
       </div>

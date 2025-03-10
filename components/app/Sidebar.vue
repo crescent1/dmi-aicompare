@@ -36,7 +36,7 @@
           v-for="item in chromeApiStore.items"
           :key="item.id"
           :title="item.title"
-          color="green-darken-2"
+          color="blue-darken-2"
           :to="'/compare/' + item.id"
           link
           class="mb-1"
@@ -201,7 +201,7 @@
   </v-navigation-drawer> -->
 
   <!-- Delete Confirmation Modal -->
-  <!-- <v-dialog
+  <v-dialog
     v-model="showDeleteModal"
     max-width="400"
   >
@@ -232,10 +232,10 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog> -->
+  </v-dialog>
 
   <!-- Rename Dialog -->
-  <!-- <v-dialog
+  <v-dialog
     v-model="showRenameDialog"
     max-width="400"
   >
@@ -272,7 +272,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog> -->
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>

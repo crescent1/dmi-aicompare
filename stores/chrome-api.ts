@@ -77,7 +77,7 @@ export const useChromeApiStore = defineStore('chrome-api', () => {
     }
   }
 
-  const prepareStoreIndexDb = (messages: Message[] | Credential[] ) => {
+  const prepareStoreIndexDb = (messages: any ) => {
     return JSON.parse(JSON.stringify(messages))
   }
 
